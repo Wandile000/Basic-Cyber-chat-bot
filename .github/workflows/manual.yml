@@ -1,0 +1,40 @@
+name: Automate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest  #  Windows runner is correct for NAudio
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '9.0'  # Keep using .NET 9.0
+
+      - name: Install NAudio package
+        run: dotnet add package NAudio  # Adds the NAudio package
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build --configuration Release
+
+      - name: Run tests
+        run: dotnet test --configuration Release
+
+      - name: Publish the application
+        run: dotnet publish --configuration Release --output ./published
+
+      - name: Run the application
+        run: dotnet ./published/CyberChatbotSecurity.dll
